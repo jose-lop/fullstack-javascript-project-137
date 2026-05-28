@@ -1,4 +1,8 @@
 body {
-  min-height: 100vh;
   background-color: #f8f9fa;
+}
+
+.feeds,
+.posts {
+  padding-left: 0;
 }
