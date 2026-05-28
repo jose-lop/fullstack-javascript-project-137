@@ -1,5 +1,22 @@
-# Automatic tests
+# RSS Aggregator
 
-After completing all the steps in the project, automatic tests will become available to you. Tests are run on each commit - once all tasks in the Hexlet interface are completed, make a commit, and the tests will run automatically.
+### Hexlet tests and linter status:
 
-The hexlet-check.yml file is responsible for running these tests - do not delete this file, edit it, or rename the repository.
+[![Actions Status](https://github.com/jose-lop/fullstack-javascript-project-137/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/jose-lop/fullstack-javascript-project-137/actions)
+
+## Demo
+
+https://tu-app.vercel.app
+
+## Description
+
+RSS Aggregator is a web application for subscribing to RSS feeds, reading posts, and automatically updating content.
+
+## Technologies
+
+- JavaScript
+- Vite
+- Bootstrap
+- ESLint
+- GitHub Actions
+- Yup
