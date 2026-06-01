@@ -3,7 +3,12 @@ import globals from "globals";
 import pluginImport from "eslint-plugin-import";
 
 export default [
+  {
+    ignores: ["dist/**"],
+  },
+
   js.configs.recommended,
+
   {
     files: ["**/*.js"],
     languageOptions: {
