@@ -24,20 +24,22 @@ document.querySelector("#app").innerHTML = `
               Es fácil, bonito y gratuito.
             </p>
 
-            <form id="rss-form">
+            <form id="rss-form"novalidate>
               <div class="row g-2">
 
                 <div class="col-md-9">
+                    <label for="url-input" class="form-label">
+                       RSS link
+                    </label>
                   <input
                     id="url-input"
                     type="text"
                     class="form-control form-control-lg"
                     placeholder="https://example.com/feed.xml"
-                    required
                   >
 
                   <div class="invalid-feedback">
-                    URL inválida o RSS no válido
+                    El enlace debe ser una URL válida
                   </div>
                 </div>
 
@@ -95,7 +97,10 @@ const form = document.querySelector("#rss-form");
 const input = document.querySelector("#url-input");
 const feedback = document.querySelector(".invalid-feedback");
 
-const schema = yup.string().url().required();
+const schema = yup
+  .string()
+  .url("El enlace debe ser una URL válida")
+  .required("No puede estar vacío");
 
 const parseRSS = (data) => {
   const parser = new DOMParser();
@@ -196,6 +201,7 @@ form.addEventListener("submit", (e) => {
       renderPosts();
 
       input.value = "";
+      input.focus();
 
       input.classList.remove("is-invalid");
 
@@ -217,7 +223,7 @@ form.addEventListener("submit", (e) => {
       } else if (error.isAxiosError) {
         feedback.textContent = "Error de red";
       } else {
-        feedback.textContent = "URL inválida o RSS no válido";
+        feedback.textContent = error.message;
       }
     });
 });
