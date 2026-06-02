@@ -28,7 +28,6 @@ document.querySelector("#app").innerHTML = `
               <div class="row g-2">
 
                 <div class="col-md-9">
-
                   <input
                     id="url-input"
                     type="text"
@@ -38,20 +37,17 @@ document.querySelector("#app").innerHTML = `
                   >
 
                   <div class="invalid-feedback">
-                    URL inválida
+                    URL inválida o RSS no válido
                   </div>
-
                 </div>
 
                 <div class="col-md-3">
-
                   <button
                     type="submit"
                     class="btn btn-primary btn-lg w-100"
                   >
                     Añadir
                   </button>
-
                 </div>
 
               </div>
@@ -64,7 +60,6 @@ document.querySelector("#app").innerHTML = `
 
           <div class="col-lg-6 mb-4">
             <div class="card border-0 shadow-sm h-100">
-
               <div class="card-body">
 
                 <h2 class="h4 mb-4">Feeds</h2>
@@ -73,13 +68,11 @@ document.querySelector("#app").innerHTML = `
                 </ul>
 
               </div>
-
             </div>
           </div>
 
           <div class="col-lg-6 mb-4">
             <div class="card border-0 shadow-sm h-100">
-
               <div class="card-body">
 
                 <h2 class="h4 mb-4">Posts</h2>
@@ -88,7 +81,6 @@ document.querySelector("#app").innerHTML = `
                 </ul>
 
               </div>
-
             </div>
           </div>
 
@@ -100,8 +92,8 @@ document.querySelector("#app").innerHTML = `
 `;
 
 const form = document.querySelector("#rss-form");
-
 const input = document.querySelector("#url-input");
+const feedback = document.querySelector(".invalid-feedback");
 
 const schema = yup.string().url().required();
 
@@ -110,38 +102,45 @@ const parseRSS = (data) => {
 
   const doc = parser.parseFromString(data, "application/xml");
 
-  console.log(doc);
+  const title = doc.querySelector("channel > title")?.textContent ?? "";
 
-  console.log(doc.querySelector("channel title"));
-  console.log(doc.querySelector("channel description"));
+  const description =
+    doc.querySelector("channel > description")?.textContent ?? "";
 
   const items = doc.querySelectorAll("item");
 
-  console.log(items);
+  const posts = Array.from(items).map((item) => ({
+    title: item.querySelector("title")?.textContent ?? "",
+    link: item.querySelector("link")?.textContent ?? "",
+  }));
 
-  const posts = Array.from(items).map((item) => {
-    console.log(item);
+  return {
+    title,
+    description,
+    posts,
+  };
+};
 
-    const postTitleElement = item.querySelector("title");
-    const linkElement = item.querySelector("link");
+const renderFeeds = () => {
+  const feedsContainer = document.querySelector(".feeds");
 
-    console.log(postTitleElement);
-    console.log(linkElement);
+  feedsContainer.innerHTML = "";
 
-    const postTitle = postTitleElement?.textContent ?? "";
-    const link = linkElement?.textContent ?? "";
+  state.feeds.forEach((feed) => {
+    const li = document.createElement("li");
 
-    return { title: postTitle, link };
+    li.classList.add("list-group-item");
+
+    li.innerHTML = `
+      <h5>${feed.title}</h5>
+      <p class="mb-0 text-muted">${feed.description}</p>
+    `;
+
+    feedsContainer.append(li);
   });
-
-  state.posts = posts;
-
-  renderPosts();
 };
 
 const renderPosts = () => {
-  console.log("Renderizando posts:", state.posts);
-
   const postsContainer = document.querySelector(".posts");
 
   postsContainer.innerHTML = "";
@@ -155,6 +154,7 @@ const renderPosts = () => {
 
     a.href = post.link;
     a.target = "_blank";
+    a.rel = "noopener noreferrer";
     a.textContent = post.title;
 
     li.append(a);
@@ -163,50 +163,61 @@ const renderPosts = () => {
   });
 };
 
-const renderFeeds = () => {
-  const feedsContainer = document.querySelector(".feeds");
-
-  feedsContainer.innerHTML = "";
-
-  state.feeds.forEach((feed) => {
-    const li = document.createElement("li");
-
-    li.classList.add("list-group-item");
-
-    li.textContent = feed;
-
-    feedsContainer.append(li);
-  });
-};
-
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const url = input.value;
+  const url = input.value.trim();
 
   schema
     .validate(url)
     .then(() => {
-      input.classList.remove("is-invalid");
+      const exists = state.feeds.some((feed) => feed.url === url);
+
+      if (exists) {
+        throw new Error("RSS ya existe");
+      }
 
       const proxy = "https://allorigins.hexlet.app/get?disableCache=true&url=";
 
-      const fullUrl = `${proxy}${encodeURIComponent(url)}`;
-
-      return axios.get(fullUrl);
+      return axios.get(`${proxy}${encodeURIComponent(url)}`);
     })
     .then((response) => {
-      parseRSS(response.data.contents);
+      const feedData = parseRSS(response.data.contents);
 
-      state.feeds.push(url);
+      state.feeds.push({
+        url,
+        title: feedData.title,
+        description: feedData.description,
+      });
+
+      state.posts.push(...feedData.posts);
 
       renderFeeds();
+      renderPosts();
 
       input.value = "";
+
+      input.classList.remove("is-invalid");
+
+      feedback.classList.remove("text-danger");
+      feedback.classList.add("text-success");
+
+      feedback.textContent = "RSS agregado correctamente";
     })
     .catch((error) => {
       console.log(error);
 
       input.classList.add("is-invalid");
+
+      feedback.classList.remove("text-success");
+      feedback.classList.add("text-danger");
+
+      if (error.message === "RSS ya existe") {
+        feedback.textContent = "Este RSS ya fue agregado";
+      } else if (error.isAxiosError) {
+        feedback.textContent = "Error de red";
+      } else {
+        feedback.textContent = "URL inválida o RSS no válido";
+      }
     });
 });
