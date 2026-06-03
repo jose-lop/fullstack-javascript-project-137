@@ -1,11 +1,15 @@
-import state from "./state.js";
-import parseRSS from "./parser.js";
-import "./view.js";
+import i18next from "i18next";
+import resources from "./locales.js";
+
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./style.css";
 
 import axios from "axios";
 import * as yup from "yup";
+
+import state from "./state.js";
+import parseRSS from "./parser.js";
+import "./view.js";
 
 document.querySelector("#app").innerHTML = `
   <div class="container-fluid">
@@ -37,7 +41,6 @@ document.querySelector("#app").innerHTML = `
                   >
 
                   <div class="invalid-feedback">
-                    El enlace debe ser una URL válida
                   </div>
                 </div>
 
@@ -95,10 +98,21 @@ const form = document.querySelector("#rss-form");
 const input = document.querySelector("#url-input");
 const feedback = document.querySelector(".invalid-feedback");
 
-const schema = yup
-  .string()
-  .url("El enlace debe ser una URL válida")
-  .required("No puede estar vacío");
+i18next.init({
+  lng: "es",
+  resources,
+});
+
+yup.setLocale({
+  mixed: {
+    required: "required",
+  },
+  string: {
+    url: "invalidUrl",
+  },
+});
+
+const schema = yup.string().required().url();
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -111,7 +125,7 @@ form.addEventListener("submit", (e) => {
       const exists = state.feeds.some((feed) => feed.url === url);
 
       if (exists) {
-        throw new Error("RSS ya existe");
+        throw new Error("duplicate");
       }
 
       const proxy = "https://allorigins.hexlet.app/get?disableCache=true&url=";
@@ -137,7 +151,7 @@ form.addEventListener("submit", (e) => {
       feedback.classList.remove("text-danger");
       feedback.classList.add("text-success");
 
-      feedback.textContent = "RSS agregado correctamente";
+      feedback.textContent = i18next.t("success.loaded");
     })
     .catch((error) => {
       console.log(error);
@@ -147,12 +161,12 @@ form.addEventListener("submit", (e) => {
       feedback.classList.remove("text-success");
       feedback.classList.add("text-danger");
 
-      if (error.message === "RSS ya existe") {
-        feedback.textContent = "Este RSS ya fue agregado";
+      if (error.message === "duplicate") {
+        feedback.textContent = i18next.t("errors.duplicate");
       } else if (error.isAxiosError) {
-        feedback.textContent = "Error de red";
+        feedback.textContent = i18next.t("errors.network");
       } else {
-        feedback.textContent = error.message;
+        feedback.textContent = i18next.t(`errors.${error.message}`);
       }
     });
 });

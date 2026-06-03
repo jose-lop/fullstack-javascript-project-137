@@ -10,6 +10,10 @@ const parseRSS = (data) => {
 
   const items = doc.querySelectorAll("item");
 
+  if (!title || items.length === 0) {
+    throw new Error("invalidRss");
+  }
+
   const posts = Array.from(items).map((item) => ({
     title: item.querySelector("title")?.textContent ?? "",
     link: item.querySelector("link")?.textContent ?? "",
