@@ -1,13 +1,11 @@
+import state from "./state.js";
+import parseRSS from "./parser.js";
+import "./view.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./style.css";
 
 import axios from "axios";
 import * as yup from "yup";
-
-const state = {
-  feeds: [],
-  posts: [],
-};
 
 document.querySelector("#app").innerHTML = `
   <div class="container-fluid">
@@ -24,7 +22,7 @@ document.querySelector("#app").innerHTML = `
               Es fácil, bonito y gratuito.
             </p>
 
-            <form id="rss-form"novalidate>
+            <form id="rss-form" novalidate>
               <div class="row g-2">
 
                 <div class="col-md-9">
@@ -102,72 +100,6 @@ const schema = yup
   .url("El enlace debe ser una URL válida")
   .required("No puede estar vacío");
 
-const parseRSS = (data) => {
-  const parser = new DOMParser();
-
-  const doc = parser.parseFromString(data, "application/xml");
-
-  const title = doc.querySelector("channel > title")?.textContent ?? "";
-
-  const description =
-    doc.querySelector("channel > description")?.textContent ?? "";
-
-  const items = doc.querySelectorAll("item");
-
-  const posts = Array.from(items).map((item) => ({
-    title: item.querySelector("title")?.textContent ?? "",
-    link: item.querySelector("link")?.textContent ?? "",
-  }));
-
-  return {
-    title,
-    description,
-    posts,
-  };
-};
-
-const renderFeeds = () => {
-  const feedsContainer = document.querySelector(".feeds");
-
-  feedsContainer.innerHTML = "";
-
-  state.feeds.forEach((feed) => {
-    const li = document.createElement("li");
-
-    li.classList.add("list-group-item");
-
-    li.innerHTML = `
-      <h5>${feed.title}</h5>
-      <p class="mb-0 text-muted">${feed.description}</p>
-    `;
-
-    feedsContainer.append(li);
-  });
-};
-
-const renderPosts = () => {
-  const postsContainer = document.querySelector(".posts");
-
-  postsContainer.innerHTML = "";
-
-  state.posts.forEach((post) => {
-    const li = document.createElement("li");
-
-    li.classList.add("list-group-item");
-
-    const a = document.createElement("a");
-
-    a.href = post.link;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.textContent = post.title;
-
-    li.append(a);
-
-    postsContainer.append(li);
-  });
-};
-
 form.addEventListener("submit", (e) => {
   e.preventDefault();
 
@@ -196,9 +128,6 @@ form.addEventListener("submit", (e) => {
       });
 
       state.posts.push(...feedData.posts);
-
-      renderFeeds();
-      renderPosts();
 
       input.value = "";
       input.focus();

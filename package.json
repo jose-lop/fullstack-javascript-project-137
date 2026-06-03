@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^1.16.1",
     "bootstrap": "^5.3.8",
+    "valtio": "^2.3.2",
     "yup": "^1.7.1"
   },
   "devDependencies": {
