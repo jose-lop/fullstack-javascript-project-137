@@ -177,3 +177,38 @@ form.addEventListener("submit", (e) => {
       }
     });
 });
+
+const updateFeeds = () => {
+  const requests = state.feeds.map((feed) => {
+    const proxy = "https://allorigins.hexlet.app/get?disableCache=true&url=";
+
+    return axios
+      .get(`${proxy}${encodeURIComponent(feed.url)}`)
+      .then((response) => {
+        const parsedFeed = parseRSS(response.data.contents);
+
+        const newPosts = parsedFeed.posts
+          .filter(
+            (post) =>
+              !state.posts.some(
+                (existingPost) => existingPost.link === post.link,
+              ),
+          )
+          .map((post) => ({
+            id: crypto.randomUUID(),
+            ...post,
+          }));
+
+        state.posts.unshift(...newPosts);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  });
+
+  Promise.all(requests).finally(() => {
+    setTimeout(updateFeeds, 5000);
+  });
+};
+
+updateFeeds();
