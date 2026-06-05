@@ -11,6 +11,20 @@ import state from "./state.js";
 import parseRSS from "./parser.js";
 import "./view.js";
 
+i18next.init({
+  lng: "es",
+  resources,
+});
+
+yup.setLocale({
+  mixed: {
+    required: "required",
+  },
+  string: {
+    url: "invalidUrl",
+  },
+});
+
 document.querySelector("#app").innerHTML = `
   <div class="container-fluid">
     <div class="row justify-content-center min-vh-100 bg-light">
@@ -98,21 +112,7 @@ const form = document.querySelector("#rss-form");
 const input = document.querySelector("#url-input");
 const feedback = document.querySelector(".invalid-feedback");
 
-i18next.init({
-  lng: "es",
-  resources,
-});
-
-yup.setLocale({
-  mixed: {
-    required: "required",
-  },
-  string: {
-    url: "invalidUrl",
-  },
-});
-
-const schema = yup.string().required().url();
+const schema = yup.string().url().required();
 
 form.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -135,13 +135,20 @@ form.addEventListener("submit", (e) => {
     .then((response) => {
       const feedData = parseRSS(response.data.contents);
 
-      state.feeds.push({
+      const feed = {
+        id: crypto.randomUUID(),
         url,
         title: feedData.title,
         description: feedData.description,
-      });
+      };
 
-      state.posts.push(...feedData.posts);
+      const posts = feedData.posts.map((post) => ({
+        id: crypto.randomUUID(),
+        ...post,
+      }));
+
+      state.feeds.push(feed);
+      state.posts.push(...posts);
 
       input.value = "";
       input.focus();
@@ -152,6 +159,7 @@ form.addEventListener("submit", (e) => {
       feedback.classList.add("text-success");
 
       feedback.textContent = i18next.t("success.loaded");
+      feedback.style.display = "block";
     })
     .catch((error) => {
       console.log(error);
@@ -160,6 +168,7 @@ form.addEventListener("submit", (e) => {
 
       feedback.classList.remove("text-success");
       feedback.classList.add("text-danger");
+      feedback.style.display = "block";
 
       if (error.message === "duplicate") {
         feedback.textContent = i18next.t("errors.duplicate");

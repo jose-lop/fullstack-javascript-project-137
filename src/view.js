@@ -11,7 +11,10 @@ export const renderFeeds = () => {
 
     li.classList.add("list-group-item");
 
-    li.textContent = feed.title;
+    li.innerHTML = `
+      <h5>${feed.title}</h5>
+      <p class="mb-0 text-muted">${feed.description}</p>
+    `;
 
     feedsContainer.append(li);
   });
@@ -31,7 +34,7 @@ export const renderPosts = () => {
 
     link.href = post.link;
     link.target = "_blank";
-
+    link.rel = "noopener noreferrer";
     link.textContent = post.title;
 
     li.append(link);
