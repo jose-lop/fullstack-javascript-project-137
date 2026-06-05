@@ -56,6 +56,7 @@ document.querySelector("#app").innerHTML = `
 
                   <div class="invalid-feedback">
                   </div>
+                  <div class="feedback mt-2"></div>
                 </div>
 
                 <div class="col-md-3">
@@ -110,7 +111,7 @@ document.querySelector("#app").innerHTML = `
 
 const form = document.querySelector("#rss-form");
 const input = document.querySelector("#url-input");
-const feedback = document.querySelector(".invalid-feedback");
+const feedback = document.querySelector(".feedback");
 
 const schema = yup.string().url().required();
 
@@ -157,9 +158,7 @@ form.addEventListener("submit", (e) => {
 
       feedback.classList.remove("text-danger");
       feedback.classList.add("text-success");
-
       feedback.textContent = i18next.t("success.loaded");
-      feedback.style.display = "block";
     })
     .catch((error) => {
       console.log(error);
@@ -168,7 +167,6 @@ form.addEventListener("submit", (e) => {
 
       feedback.classList.remove("text-success");
       feedback.classList.add("text-danger");
-      feedback.style.display = "block";
 
       if (error.message === "duplicate") {
         feedback.textContent = i18next.t("errors.duplicate");
