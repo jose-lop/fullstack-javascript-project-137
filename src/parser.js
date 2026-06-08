@@ -1,3 +1,9 @@
+const decodeHtml = (text) => {
+  const textarea = document.createElement("textarea");
+  textarea.innerHTML = text;
+  return textarea.value;
+};
+
 const parseRSS = (data) => {
   const parser = new DOMParser();
 
@@ -15,7 +21,10 @@ const parseRSS = (data) => {
   }
 
   const posts = Array.from(items).map((item) => ({
-    title: item.querySelector("title")?.textContent ?? "",
+    title: decodeHtml(item.querySelector("title")?.textContent ?? ""),
+    description: decodeHtml(
+      item.querySelector("description")?.textContent ?? "",
+    ),
     link: item.querySelector("link")?.textContent ?? "",
   }));
 

@@ -28,7 +28,12 @@ export const renderPosts = () => {
   state.posts.forEach((post) => {
     const li = document.createElement("li");
 
-    li.classList.add("list-group-item");
+    li.classList.add(
+      "list-group-item",
+      "d-flex",
+      "justify-content-between",
+      "align-items-start",
+    );
 
     const link = document.createElement("a");
 
@@ -37,13 +42,48 @@ export const renderPosts = () => {
     link.rel = "noopener noreferrer";
     link.textContent = post.title;
 
+    const isRead = state.readPosts.includes(post.id);
+
+    link.classList.add(isRead ? "fw-normal" : "fw-bold");
+
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.classList.add("btn", "btn-outline-primary", "btn-sm");
+
+    button.textContent = "Vista previa";
+
+    button.dataset.id = post.id;
+    link.dataset.id = post.id;
+
+    button.setAttribute("data-bs-toggle", "modal");
+    button.setAttribute("data-bs-target", "#modal");
+
     li.append(link);
+    li.append(button);
 
     postsContainer.append(li);
   });
 };
 
+const renderModal = () => {
+  const post = state.posts.find((item) => item.id === state.modal.postId);
+
+  if (!post) {
+    return;
+  }
+
+  const modalTitle = document.querySelector(".modal-title");
+  const modalBody = document.querySelector(".modal-body p");
+  const fullArticle = document.querySelector(".full-article");
+
+  modalTitle.textContent = post.title;
+  modalBody.textContent = post.description;
+  fullArticle.href = post.link;
+};
+
 subscribe(state, () => {
   renderFeeds();
   renderPosts();
+  renderModal();
 });

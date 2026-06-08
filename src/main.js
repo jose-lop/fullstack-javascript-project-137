@@ -2,6 +2,7 @@ import i18next from "i18next";
 import resources from "./locales.js";
 
 import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap";
 import "./style.css";
 
 import axios from "axios";
@@ -103,6 +104,51 @@ document.querySelector("#app").innerHTML = `
           </div>
 
         </div>
+        <div
+          class="modal fade"
+          id="modal"
+          tabindex="-1"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog">
+            <div class="modal-content">
+
+              <div class="modal-header">
+                <h5 class="modal-title"></h5>
+
+                <button
+                  type="button"
+                  class="btn-close"
+                  data-bs-dismiss="modal"
+                ></button>
+              </div>
+
+              <div class="modal-body">
+                <p></p>
+              </div>
+
+              <div class="modal-footer">
+                <a
+                  class="btn btn-primary full-article"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Leer completo
+                </a>
+
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-bs-dismiss="modal"
+                >
+                  Cerrar
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
 
       </div>
     </div>
@@ -176,6 +222,20 @@ form.addEventListener("submit", (e) => {
         feedback.textContent = i18next.t(`errors.${error.message}`);
       }
     });
+});
+
+document.addEventListener("click", (e) => {
+  const { id } = e.target.dataset;
+
+  if (!id) {
+    return;
+  }
+
+  state.modal.postId = id;
+
+  if (!state.readPosts.includes(id)) {
+    state.readPosts.push(id);
+  }
 });
 
 const updateFeeds = () => {
