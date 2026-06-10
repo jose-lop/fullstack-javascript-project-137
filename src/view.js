@@ -44,7 +44,11 @@ export const renderPosts = () => {
 
     const isRead = state.readPosts.includes(post.id);
 
-    link.classList.add(isRead ? "fw-normal" : "fw-bold");
+    if (isRead) {
+      link.classList.add("fw-normal", "link-secondary");
+    } else {
+      link.classList.add("fw-bold");
+    }
 
     const button = document.createElement("button");
 
