@@ -1,15 +1,15 @@
 export default {
-  es: {
+  ru: {
     translation: {
       errors: {
         required: "No puede estar vacío",
-        invalidUrl: "El enlace debe ser una URL válida",
-        duplicate: "RSS ya existe",
+        invalidUrl: "Debes ingresar una URL válida",
+        duplicate: "El RSS ya existe",
         network: "Error de red",
-        invalidRss: "RSS no válido",
+        invalidRss: "El recurso no contiene un RSS valido",
       },
       success: {
-        loaded: "RSS agregado correctamente",
+        loaded: "El RSS se cargó correctamente",
       },
     },
   },

@@ -12,6 +12,8 @@ import state from "./state.js";
 import parseRSS from "./parser.js";
 import "./view.js";
 
+import uniqueId from "lodash/uniqueId.js";
+
 i18next.init({
   lng: "ru",
   resources,
@@ -184,14 +186,14 @@ form.addEventListener("submit", (e) => {
       const feedData = parseRSS(response.data.contents);
 
       const feed = {
-        id: crypto.randomUUID(),
+        id: uniqueId(),
         url,
         title: feedData.title,
         description: feedData.description,
       };
 
       const posts = feedData.posts.map((post) => ({
-        id: crypto.randomUUID(),
+        id: uniqueId(),
         ...post,
       }));
 
@@ -256,7 +258,7 @@ const updateFeeds = () => {
               ),
           )
           .map((post) => ({
-            id: crypto.randomUUID(),
+            id: uniqueId(),
             ...post,
           }));
 

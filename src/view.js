@@ -12,7 +12,7 @@ export const renderFeeds = () => {
     li.classList.add("list-group-item");
 
     li.innerHTML = `
-      <h5>${feed.title}</h5>
+      <h3>${feed.title}</h3>
       <p class="mb-0 text-muted">${feed.description}</p>
     `;
 
