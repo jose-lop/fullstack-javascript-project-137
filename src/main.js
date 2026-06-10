@@ -51,6 +51,7 @@ document.querySelector("#app").innerHTML = `
                   <input
                     id="url-input"
                     type="text"
+                    aria-label="url"
                     class="form-control form-control-lg"
                     placeholder="https://example.com/feed.xml"
                   >
