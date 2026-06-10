@@ -13,7 +13,7 @@ import parseRSS from "./parser.js";
 import "./view.js";
 
 i18next.init({
-  lng: "es",
+  lng: "ru",
   resources,
 });
 
